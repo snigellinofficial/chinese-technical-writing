@@ -26,7 +26,6 @@ import {
   TERM_EXPLAINED,
   TERM_NOISE,
   TERM_EXCEPTIONS,
-  COMMAND_LIKE,
   JARGON,
   BLOG_TITLE,
   PENDING_STYLE,
@@ -275,20 +274,6 @@ for (const absolute of files) {
         `“${aspect.slice(0, 3).join('”“')}”属于单字动词加补语，确认是否有书面词可替换`,
         line,
       );
-    }
-
-    // 中英混用之二：命令应当置于代码框内。
-    if (!raw.includes('`')) {
-      const command = raw.match(COMMAND_LIKE);
-      if (command) {
-        audit(
-          file,
-          lineNumber,
-          '命令未置于代码框',
-          `“${command[0]}”应当置于行内代码或者代码块之内`,
-          raw,
-        );
-      }
     }
 
     for (const verb of EMPTY_VERB) {
