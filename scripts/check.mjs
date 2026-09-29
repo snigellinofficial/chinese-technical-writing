@@ -64,6 +64,9 @@ const EMPTY_VERB = ['指向', '关乎', '意味着', '赋能于'];
 // 表示归类时后面接名词短语，因此只检查“作为”引导的动词性解释与“作为……的”结构。
 const AS_EXPLAINING = /作为[^，。；：]{0,12}(?:的|地|方式|手段|方法|途径|工具)|作为[^，。；：]{0,20}(?:使用|处理|说明|判断|衡量|解决)/;
 
+// 长句未切分：一段之内连续 56 个字符没有出现逗号、分号、顿号或者句中点号。
+const LONG_CLAUSE = /[^，；、：,;]{56,}/;
+
 // 解释型冒号：正文语句中不应当用冒号引出解释。
 const EXPLANATORY_COLON = /[\u4e00-\u9fff]：[^“”\s]/;
 // 以下情形属于列表引出、引用引出与枚举分档，不计入审计。
@@ -192,6 +195,18 @@ for (const absolute of files) {
       audit(file, lineNumber, '待确认写法', '改用“待确认事项：”加编号列表', line);
     }
 
+    // 排除链接与行内代码之后，检查是否出现长时间没有切分的长句。
+    const clause = maskLine(raw).match(LONG_CLAUSE);
+    if (clause) {
+      audit(
+        file,
+        lineNumber,
+        '长句未切分',
+        '连续 56 字以上没有停顿，应当用逗号或者分号切分',
+        clause[0],
+      );
+    }
+
     if (BARE_LIST.test(line)) {
       audit(file, lineNumber, '并列信息未编号', '并列信息应当用编号或者“首先”“其次”逐项写明', line);
     }
@@ -252,12 +267,14 @@ for (const absolute of files) console.log(`  ${relative(process.cwd(), absolute)
 
 console.log(`\n可直接判定的问题：${issues.length} 处`);
 for (const issue of issues) {
-  console.log(`${issue.file}:${issue.line}: [${issue.rule}] ${issue.detail} —— ${issue.excerpt}`);
+  console.log(`${issue.file}:${issue.line}: [${issue.rule}] ${issue.detail}`);
+  console.log(`  原文：${issue.excerpt}`);
 }
 
 console.log(`\n需要人工核对的审计项：${audits.length} 处`);
 for (const item of audits) {
-  console.log(`${item.file}:${item.line}: [${item.rule}] ${item.detail} —— ${item.excerpt}`);
+  console.log(`${item.file}:${item.line}: [${item.rule}] ${item.detail}`);
+  console.log(`  原文：${item.excerpt}`);
 }
 
 if (issues.length > 0) {
