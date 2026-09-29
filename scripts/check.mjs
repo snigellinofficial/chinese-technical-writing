@@ -245,7 +245,8 @@ for (const absolute of files) {
       audit(file, lineNumber, '并列信息未编号', '并列信息应当用编号或者“首先”“其次”逐项写明', line);
     }
 
-    if (AS_FOLLOWS_INLINE.test(line)) {
+    // 判定之前先去掉引号之内的内容，避免把规则自身的引用判为违规。
+    if (AS_FOLLOWS_INLINE.test(line.replace(/“[^”]*”/g, ''))) {
       audit(file, lineNumber, '如下用法', '“如下”之后应当使用冒号并另起一段，段首用顺序词或编号', line);
     }
 
