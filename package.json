@@ -1,5 +1,5 @@
 {
-  "name": "chinese-technical-writing",
+  "name": "let-us-speak-chinese",
   "version": "0.1.0",
   "description": "面向大语言模型的中文写作规范，含逐条判据与检查程序",
   "license": "MIT",
@@ -12,11 +12,18 @@
     "NOTICE.md",
     "README.md",
     "LICENSE",
-    "scripts/check.mjs"
+    "self-test.mjs",
+    "scripts/check.mjs",
+    "scripts/rules.mjs",
+    "scripts/word-audit.mjs",
+    "scripts/verb-cluster.mjs",
+    "scripts/function-audit.mjs",
+    "scripts/sample-extract.mjs"
   ],
   "scripts": {
     "check": "node scripts/check.mjs",
-    "check:all": "node scripts/check.mjs SKILL.md reference.md DEVELOPMENT.md README.md NOTICE.md"
+    "check:all": "node scripts/check.mjs SKILL.md reference.md DEVELOPMENT.md README.md NOTICE.md",
+    "self-test": "node self-test.mjs"
   },
   "keywords": [
     "chinese",

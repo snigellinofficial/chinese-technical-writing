@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="让我们讲中文！LET US SPEAK CHINESE">
+  <title>让我们讲中文！LET US SPEAK CHINESE</title>
+  <desc>本项目的中文名称为“让我们讲中文！”，英文名称为 LET US SPEAK CHINESE。</desc>
+
+  <rect width="1280" height="400" fill="#0f172a"/>
+  <rect x="12" y="12" width="1256" height="376" rx="18" fill="none" stroke="#334155" stroke-width="4"/>
+
+  <text x="64" y="186"
+        font-family="Microsoft YaHei, PingFang SC, Noto Sans SC, Source Han Sans SC, sans-serif"
+        font-size="132" font-weight="700" letter-spacing="6" fill="#e2e8f0">让我们讲中文！</text>
+
+  <text x="64" y="286"
+        font-family="ui-monospace, SFMono-Regular, Consolas, Menlo, monospace"
+        font-size="52" font-weight="700" letter-spacing="10" fill="#78350f" opacity="0.55">LET US SPEAK CHINESE</text>
+
+  <text x="64" y="282"
+        font-family="ui-monospace, SFMono-Regular, Consolas, Menlo, monospace"
+        font-size="52" font-weight="700" letter-spacing="10" fill="#facc15">LET US SPEAK CHINESE</text>
+
+  <text x="64" y="340"
+        font-family="Microsoft YaHei, PingFang SC, Noto Sans SC, Source Han Sans SC, sans-serif"
+        font-size="30" fill="#94a3b8">不编造否定，不自造术语，不跳过解释</text>
+
+  <rect x="966" y="300" width="14" height="14" fill="#38bdf8"/>
+  <g fill="#facc15">
+    <rect x="992" y="296" width="7" height="18"/>
+    <rect x="1003" y="292" width="7" height="22"/>
+    <rect x="1014" y="300" width="7" height="14"/>
+    <rect x="1025" y="288" width="7" height="26"/>
+    <rect x="1036" y="296" width="7" height="18"/>
+    <rect x="1047" y="292" width="7" height="22"/>
+    <rect x="1058" y="304" width="7" height="10"/>
+    <rect x="1069" y="296" width="7" height="18"/>
+  </g>
+</svg>
