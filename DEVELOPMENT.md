@@ -37,6 +37,8 @@ emoji、套话、句长与段落粒度同样无法可靠地机械判定，一并
 
 虚词与句式部分的候选由 `scripts/function-audit.mjs` 生成。该程序统计口语化虚词、可选择凝练的双字虚词，以及成对出现的句式模板。上一次统计命中虚词 20 个以上、句式 6 个，结果保存在 `function-audit.md`。其中“需要”“可以”“可能”属于规范书面词，列入保留范围。
 
+违规样例由 `scripts/sample-extract.mjs` 提取。该程序按十三类规则筛选助手文本中的原始语句，输出每类的候选清单与命中次数，结果保存在 `sample-extract.md`，用于说明页的规则实例与词表扩充。语料分布并不均匀，评断性恭维、缩略化表达、主语省略与时间状态四类在语料中命中稀少。
+
 扩充词表的步骤有五步：
 
 首先，运行 `node scripts/word-audit.mjs word-audit.md`、`node scripts/verb-cluster.mjs verb-cluster.md` 与 `node scripts/function-audit.mjs function-audit.md`，取得新的分布。
