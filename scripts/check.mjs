@@ -45,6 +45,10 @@ const NEGATION_AUDIT =
 // 并列信息未编号的写法：应当用编号或者“首先”“其次”逐项写明。
 const BARE_LIST = /[一二三四五六七八九十两]处[，、][^。；]{2,}[，、][^。；]{2,}[，、]/;
 
+// “如下”引出内容：其后应当使用冒号，并且另起一段。
+// 行末的“如下”与“如下：”均符合规范；内容与引出语同行时才需要改为分段。
+const AS_FOLLOWS_INLINE = /如下[所示]*[，、。；]|如下[所示]*[^：。；，、\s]{2,}/;
+
 // 解释型冒号：正文语句中不应当用冒号引出解释。
 const EXPLANATORY_COLON = /[\u4e00-\u9fff]：[^“”\s]/;
 // 以下情形属于列表引出、引用引出与枚举分档，不计入审计。
@@ -175,6 +179,10 @@ for (const absolute of files) {
 
     if (BARE_LIST.test(line)) {
       audit(file, lineNumber, '并列信息未编号', '并列信息应当用编号或者“首先”“其次”逐项写明', line);
+    }
+
+    if (AS_FOLLOWS_INLINE.test(line)) {
+      audit(file, lineNumber, '如下用法', '“如下”之后应当使用冒号并另起一段，段首用顺序词或编号', line);
     }
 
     if (
