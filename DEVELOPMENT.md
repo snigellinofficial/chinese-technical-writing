@@ -35,15 +35,19 @@ emoji、套话、句长与段落粒度同样无法可靠地机械判定，一并
 
 动词部分的候选词由 `scripts/verb-cluster.mjs` 生成。该程序从同一批语料中提取动词性片段，按后缀结构聚类，覆盖三类形态：单字动词加体标记或者补语（写完、装好、跑完）、虚化动词加双字名词（进行处理）、口语动词短语（看一下、跑一遍）。上一次统计命中 85 个片段，结果保存在 `verb-cluster.md`。
 
-扩充词表的步骤有四步：
+虚词与句式部分的候选由 `scripts/function-audit.mjs` 生成。该程序统计口语化虚词、可选择凝练的双字虚词，以及成对出现的句式模板。上一次统计命中虚词 20 个以上、句式 6 个，结果保存在 `function-audit.md`。其中“需要”“可以”“可能”属于规范书面词，列入保留范围。
 
-首先，运行 `node scripts/word-audit.mjs word-audit.md` 与 `node scripts/verb-cluster.mjs verb-cluster.md` 取得新的分布。
+扩充词表的步骤有五步：
 
-其次，把命中次数较高的新词补入 `scripts/rules.mjs` 的 `COLLOQUIAL` 表，并给出对应的书面表述。
+首先，运行 `node scripts/word-audit.mjs word-audit.md`、`node scripts/verb-cluster.mjs verb-cluster.md` 与 `node scripts/function-audit.mjs function-audit.md`，取得新的分布。
 
-再次，在 `reference.md` 的替换表中补充同一组对照关系。
+其次，把命中次数较高的新词补入 `scripts/rules.mjs` 的对应表：口语与空洞词用 `COLLOQUIAL`，口语虚词用 `FUNCTION_WORDS`，可选凝练的虚词用 `FUNCTION_OPTIONAL`，评断性表述用 `FLATTERY`。
 
-最后，运行 `node self-test.mjs` 与检查程序，确认规则仍然通过。
+再次，在 `reference.md` 的替换表中补充同一组对照关系，句式模板补入 `PATTERN_TEMPLATES`。
+
+然后，运行 `node self-test.mjs` 与检查程序，确认规则仍然通过。
+
+最后，判断该词是否需要跨会话生效。判断标准是**该规则是否与具体任务无关**。如与任务无关，同时写入客户端的全局指令文件；如与任务相关，留在本 skill 即可。
 
 ## 三、改动流程
 

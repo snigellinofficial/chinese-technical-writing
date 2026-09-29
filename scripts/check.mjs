@@ -15,6 +15,9 @@ import {
   COLLOQUIAL,
   ELEGANT_IDIOMS,
   FLATTERY,
+  FUNCTION_WORDS,
+  FUNCTION_OPTIONAL,
+  PATTERN_TEMPLATES,
   JARGON,
   BLOG_TITLE,
   PENDING_STYLE,
@@ -162,6 +165,32 @@ for (const absolute of files) {
       if (line.includes(word)) {
         audit(file, lineNumber, '评断与恭维之词', `“${word}”应当改为直接陈述处理方式`, line);
         break;
+      }
+    }
+
+    // 口语化虚词：命中即列为审计项，提示改为书面表述。
+    for (const [word, formal] of FUNCTION_WORDS) {
+      if (line.includes(word)) {
+        audit(file, lineNumber, '口语虚词', `“${word}”应当改为“${formal}”`, line);
+      }
+    }
+
+    // 可选择替换的虚词：只在同一行出现多个时提示，避免逐词报出。
+    const optionalHits = [...FUNCTION_OPTIONAL.keys()].filter((word) => line.includes(word));
+    if (optionalHits.length >= 2) {
+      audit(
+        file,
+        lineNumber,
+        '虚词可凝练',
+        `“${optionalHits.join('”“')}”可以改用单字形式`,
+        line,
+      );
+    }
+
+    // 句式模板：成对出现的套话结构，命中即提示复核。
+    for (const [label, pattern] of PATTERN_TEMPLATES) {
+      if (new RegExp(pattern.source).test(line)) {
+        audit(file, lineNumber, '句式模板', `“${label}”属于成对套话，确认是否必要`, line);
       }
     }
 
