@@ -14,6 +14,7 @@ import {
   BANNED,
   COLLOQUIAL,
   ELEGANT_IDIOMS,
+  FLATTERY,
   JARGON,
   BLOG_TITLE,
   PENDING_STYLE,
@@ -152,6 +153,14 @@ for (const absolute of files) {
     for (const idiom of ELEGANT_IDIOMS) {
       if (line.includes(idiom)) {
         audit(file, lineNumber, '典雅成语', `“${idiom}”属于规范书面表达，予以保留`, line);
+        break;
+      }
+    }
+
+    // 评断与恭维之词：命中即列为审计项，提示改为直接陈述。
+    for (const word of FLATTERY) {
+      if (line.includes(word)) {
+        audit(file, lineNumber, '评断与恭维之词', `“${word}”应当改为直接陈述处理方式`, line);
         break;
       }
     }
