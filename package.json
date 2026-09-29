@@ -1,0 +1,32 @@
+{
+  "name": "chinese-technical-writing",
+  "version": "0.1.0",
+  "description": "面向大语言模型的中文写作规范，含逐条判据与检查程序",
+  "license": "MIT",
+  "type": "module",
+  "private": false,
+  "files": [
+    "SKILL.md",
+    "reference.md",
+    "DEVELOPMENT.md",
+    "NOTICE.md",
+    "README.md",
+    "LICENSE",
+    "scripts/check.mjs"
+  ],
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "check:all": "node scripts/check.mjs SKILL.md reference.md DEVELOPMENT.md README.md NOTICE.md"
+  },
+  "keywords": [
+    "chinese",
+    "writing",
+    "style-guide",
+    "skill",
+    "prompt",
+    "documentation"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
