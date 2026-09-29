@@ -1,35 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="让我们讲中文！LET US SPEAK CHINESE">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 852 192" width="852" height="192" role="img" aria-label="让我们讲中文！LET US SPEAK CHINESE">
   <title>让我们讲中文！LET US SPEAK CHINESE</title>
-  <desc>本项目的中文名称为“让我们讲中文！”，英文名称为 LET US SPEAK CHINESE。</desc>
-
-  <rect width="1280" height="400" fill="#0f172a"/>
-  <rect x="12" y="12" width="1256" height="376" rx="18" fill="none" stroke="#334155" stroke-width="4"/>
-
-  <text x="64" y="186"
-        font-family="Microsoft YaHei, PingFang SC, Noto Sans SC, Source Han Sans SC, sans-serif"
-        font-size="132" font-weight="700" letter-spacing="6" fill="#e2e8f0">让我们讲中文！</text>
-
-  <text x="64" y="286"
-        font-family="ui-monospace, SFMono-Regular, Consolas, Menlo, monospace"
-        font-size="52" font-weight="700" letter-spacing="10" fill="#78350f" opacity="0.55">LET US SPEAK CHINESE</text>
-
-  <text x="64" y="282"
-        font-family="ui-monospace, SFMono-Regular, Consolas, Menlo, monospace"
-        font-size="52" font-weight="700" letter-spacing="10" fill="#facc15">LET US SPEAK CHINESE</text>
-
-  <text x="64" y="340"
-        font-family="Microsoft YaHei, PingFang SC, Noto Sans SC, Source Han Sans SC, sans-serif"
-        font-size="30" fill="#94a3b8">不编造否定，不自造术语，不跳过解释</text>
-
-  <rect x="966" y="300" width="14" height="14" fill="#38bdf8"/>
-  <g fill="#facc15">
-    <rect x="992" y="296" width="7" height="18"/>
-    <rect x="1003" y="292" width="7" height="22"/>
-    <rect x="1014" y="300" width="7" height="14"/>
-    <rect x="1025" y="288" width="7" height="26"/>
-    <rect x="1036" y="296" width="7" height="18"/>
-    <rect x="1047" y="292" width="7" height="22"/>
-    <rect x="1058" y="304" width="7" height="10"/>
-    <rect x="1069" y="296" width="7" height="18"/>
+  <desc>字形取自像素字体 Zpix，该字体以 MIT 许可发布。</desc>
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Zpix Embedded';
+        src: url(data:font/ttf;base64,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) format('truetype');
+        font-weight: normal;
+        font-style: normal;
+      }
+      .cjk { font-family: 'Zpix Embedded', monospace; font-size: 48px; fill: #e8d8a8; }
+      .latin { font-family: 'Zpix Embedded', monospace; font-size: 24px; letter-spacing: 12px; fill: #facc15; }
+    </style>
+  </defs>
+  <rect width="852" height="192" fill="#0b1220"/>
+  <g fill="#334155" shape-rendering="crispEdges">
+    <rect x="32" y="24" width="8" height="24"/>
+    <rect x="24" y="32" width="24" height="8"/>
+    <rect x="812" y="24" width="8" height="24"/>
+    <rect x="804" y="32" width="24" height="8"/>
+    <rect x="32" y="144" width="8" height="24"/>
+    <rect x="24" y="152" width="24" height="8"/>
+    <rect x="812" y="144" width="8" height="24"/>
+    <rect x="804" y="152" width="24" height="8"/>
   </g>
+  <text class="cjk" x="426" y="84" text-anchor="middle">让我们讲中文！</text>
+  <text class="latin" x="426" y="156" text-anchor="middle">LET US SPEAK CHINESE</text>
 </svg>
