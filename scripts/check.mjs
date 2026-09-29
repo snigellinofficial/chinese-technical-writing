@@ -6,74 +6,34 @@
 //   node scripts/check.mjs 路径1 路径2 …   # 检查指定的文件，目录会被递归展开
 //
 // 退出码：0 表示没有可直接判定的问题；1 表示存在问题，需要修改。
+// 规则表达式集中在 scripts/rules.mjs，本文件只负责读取文件、逐行判定与输出结果。
 
 import { readFileSync, statSync, readdirSync } from 'node:fs';
 import { join, extname, relative, sep } from 'node:path';
+import {
+  BANNED,
+  COLLOQUIAL,
+  JARGON,
+  BLOG_TITLE,
+  PENDING_STYLE,
+  NEGATION_AUDIT,
+  BARE_LIST,
+  AS_FOLLOWS_INLINE,
+  EMPTY_VERB,
+  AS_EXPLAINING,
+  EXPLANATORY_COLON,
+  COLON_ALLOWED,
+  COLON_BEFORE_LIST,
+  LIST_INTRO_PERIOD,
+  LONG_CLAUSE,
+} from './rules.mjs';
 
 const CJK = /[\u4e00-\u9fff]/;
 const HEADING_TRAILING_PUNCT = /[，。、；：]$/;
 const FULL_MARKS = '，。、；：？！（）《》“”⋯—';
 const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u;
 const HALF_TO_FULL = new Map([[',', '，'], [';', '；'], [':', '：'], ['?', '？'], ['!', '！']]);
-
-// 套话与追问：命中即计入问题。
-const BANNED = ['综上所述', '值得注意的是', '需要我继续吗'];
-
-// 口语用词：命中后提示应当采用的书面表述。
-const COLLOQUIAL = new Map([
-  ['落盘', '写入文件，储存'],
-  ['跑一遍', '执行一次'],
-  ['搞定', '完成'],
-  ['弄错', '出现错误'],
-  ['说白了', '简言之'],
-  ['加一块', '一并加入'],
-  ['毛病', '问题'],
-  ['站不住', '缺乏依据'],
-  ['早就有', '已有'],
-  ['放进', '置于'],
-  ['取出', '提取'],
-  ['看着', '看似'],
-]);
-
-// 高级词：命中后提示确认读者能否理解，必要时展开为朴实表述。
-const JARGON = ['赋能', '闭环', '抓手', '拉齐', '颗粒度', '复用', '落地', '心智'];
-
-// 博客式标题：标题应当直述主题。
-const BLOG_TITLE = /(为什么|怎么|如何|你还在|竟然|居然|揭秘|真相|指南$|大全$)/;
-
-// 待确认事项应当写成“待确认事项：”加编号列表。
-const PENDING_STYLE = /(一处|一点|一个)(需|要)(你)?确认|需你确认/;
-
-// 以否定衬肯定的句式：需要核对被否定之物是否真实出现过。
-const NEGATION_AUDIT =
-  /不是[^。；]{0,20}而是|并非[^。；]{0,20}而是|不只是[^。；]{0,20}而是|不在于[^。；]{0,20}而在于/g;
-
-// 并列信息未编号的写法：应当用编号或者“首先”“其次”逐项写明。
-const BARE_LIST = /[一二三四五六七八九十两]处[，、][^。；]{2,}[，、][^。；]{2,}[，、]/;
-
-// “如下”引出内容：其后应当使用冒号，并且另起一段。
-// 行末的“如下”与“如下：”均符合规范；内容与引出语同行时才需要改为分段。
-const AS_FOLLOWS_INLINE = /如下[所示]*[，、。；]|如下[所示]*[^：。；，、\s]{2,}/;
-
-// 跨段列举是否带编号无法由程序可靠判定：列举之后常跟承接段落，二者结构相同。
-// 该项列入“参考”文档的实现要点，由输出之前的自检承担。
-
-// 空洞动词：应当替换为具体动作。
-const EMPTY_VERB = ['指向', '关乎', '意味着', '赋能于'];
-// “作为”引出解释的写法：该词只用于表示身份归类。
-// 表示归类时后面接名词短语，因此只检查“作为”引导的动词性解释与“作为……的”结构。
-const AS_EXPLAINING = /作为[^，。；：]{0,12}(?:的|地|方式|手段|方法|途径|工具)|作为[^，。；：]{0,20}(?:使用|处理|说明|判断|衡量|解决)/;
-
-// 长句未切分：一段之内连续 56 个字符没有出现逗号、分号、顿号或者句中点号。
-const LONG_CLAUSE = /[^，；、：,;]{56,}/;
-
-// 解释型冒号：正文语句中不应当用冒号引出解释。
-const EXPLANATORY_COLON = /[\u4e00-\u9fff]：[^“”\s]/;
-// 以下情形属于列表引出、引用引出与枚举分档，不计入审计。
-const COLON_ALLOWED =
-  /(分档|分级|四级|如下|以下|包括|例如|示例|原文|来源|构成|写进|判据|六节|分为|依次|如下所示|两类|三类|四类|五类|几种|若干类|情况|文本|方面|条件|部分|步骤|标准|字段|参数|要求|规定)[^。]{0,8}：/;
-// 冒号之后紧接编号、一/二/三列项或者分号，属于列表引出。
-const COLON_BEFORE_LIST = /[\u4e00-\u9fff]：(?:[1-9]\d*[.、)]|[（(][1-9\d]+[）)]|[一二三四五六七八九十]、|是|有|包括|例如|[^，。；]{1,12}[，、；])/;
+const INLINE_CODE_EDGE = new RegExp('[\u4e00-\u9fff]`[^`]|[^`]`[\u4e00-\u9fff]', 'g');
 
 const isTableRule = (line) => /^\s*\|?[\s:|-]+\|[\s:|-]*$/.test(line) && line.includes('|');
 const isListItem = (line) => /^\s*([-*|>]|\d+[.、)]|（\d+）)/.test(line);
@@ -124,7 +84,8 @@ for (const absolute of files) {
     report(file, 1, '文件名含中文', '文件名只允许使用小写半角字符', file);
   }
 
-  const lines = readFileSync(absolute, 'utf8').split(/\r?\n/);
+  const content = readFileSync(absolute, 'utf8');
+  const lines = content.split(/\r?\n/);
   let inFence = false;
 
   lines.forEach((raw, index) => {
@@ -198,13 +159,7 @@ for (const absolute of files) {
     // 排除链接与行内代码之后，检查是否出现长时间没有切分的长句。
     const clause = maskLine(raw).match(LONG_CLAUSE);
     if (clause) {
-      audit(
-        file,
-        lineNumber,
-        '长句未切分',
-        '连续 56 字以上没有停顿，应当用逗号或者分号切分',
-        clause[0],
-      );
+      audit(file, lineNumber, '长句未切分', '连续 56 字以上没有停顿，应当用逗号或者分号切分', clause[0]);
     }
 
     if (BARE_LIST.test(line)) {
@@ -213,6 +168,10 @@ for (const absolute of files) {
 
     if (AS_FOLLOWS_INLINE.test(line)) {
       audit(file, lineNumber, '如下用法', '“如下”之后应当使用冒号并另起一段，段首用顺序词或编号', line);
+    }
+
+    if (LIST_INTRO_PERIOD.test(raw)) {
+      audit(file, lineNumber, '列举引出语用句号', '引出列举的短句应当以冒号收尾', raw);
     }
 
     for (const verb of EMPTY_VERB) {
@@ -242,24 +201,22 @@ for (const absolute of files) {
 
   // 行内代码两侧与汉字之间要有空格，只检查围栏之外的正文。
   let inlineFence = false;
-  readFileSync(absolute, 'utf8')
-    .split(/\r?\n/)
-    .forEach((raw, index) => {
-      if (/^\s*(```|~~~)/.test(raw)) {
-        inlineFence = !inlineFence;
-        return;
-      }
-      if (inlineFence) return;
-      const found = raw.match(new RegExp('[\u4e00-\u9fff]`[^`]|[^`]`[\u4e00-\u9fff]', 'g'));
-      if (!found) return;
-      const hits = found.filter((snippet) => {
-        const edge = snippet.startsWith('`') ? snippet.slice(1, 2) : snippet.slice(0, 1);
-        return !FULL_MARKS.includes(edge) && !CJK.test(edge);
-      });
-      if (hits.length > 0) {
-        report(file, index + 1, '行内代码两侧缺空格', `“${hits[0]}”两侧应当有一个半角空格`, raw);
-      }
+  content.split(/\r?\n/).forEach((raw, index) => {
+    if (/^\s*(```|~~~)/.test(raw)) {
+      inlineFence = !inlineFence;
+      return;
+    }
+    if (inlineFence) return;
+    const found = raw.match(INLINE_CODE_EDGE);
+    if (!found) return;
+    const hits = found.filter((snippet) => {
+      const edge = snippet.startsWith('`') ? snippet.slice(1, 2) : snippet.slice(0, 1);
+      return !FULL_MARKS.includes(edge) && !CJK.test(edge);
     });
+    if (hits.length > 0) {
+      report(file, index + 1, '行内代码两侧缺空格', `“${hits[0]}”两侧应当有一个半角空格`, raw);
+    }
+  });
 }
 
 console.log(`检查文件：${files.length} 个`);
