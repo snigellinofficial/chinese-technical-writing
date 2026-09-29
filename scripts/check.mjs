@@ -21,6 +21,7 @@ import {
   TRUNCATED,
   NOUN_PHRASE_COLON,
   MISSING_TIME_MARK,
+  ABRUPT_TURN,
   JARGON,
   BLOG_TITLE,
   PENDING_STYLE,
@@ -242,6 +243,17 @@ for (const absolute of files) {
 
     if (AS_FOLLOWS_INLINE.test(line)) {
       audit(file, lineNumber, '如下用法', '“如下”之后应当使用冒号并另起一段，段首用顺序词或编号', line);
+    }
+
+    // 生硬转折：转折词两侧都是短评价语时，提示展开为完整分句。
+    if (ABRUPT_TURN.test(line)) {
+      audit(
+        file,
+        lineNumber,
+        '生硬转折',
+        '转折词两侧须展开为完整分句，或者拆成两句陈述理由',
+        line,
+      );
     }
 
     if (LIST_INTRO_PERIOD.test(raw)) {

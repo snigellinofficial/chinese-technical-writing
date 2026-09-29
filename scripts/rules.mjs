@@ -244,5 +244,17 @@ export const VERB_ASPECT = new RegExp(
   ].join(''),
 );
 
+// 生硬转折：转折词的两侧都是短评价语，或者某一侧不足四字。
+// 合规写法为把两侧展开为完整分句，或者拆成两句陈述理由。
+const TURN = '(?:但|却|可是|不过)';
+const SHORT_EVAL = '[\\u4e00-\\u9fff]{1,4}';
+export const ABRUPT_TURN = new RegExp(
+  [
+    `${TURN}${SHORT_EVAL}[，。；]`,
+    `[，。；]${SHORT_EVAL}${TURN}[。；]`,
+    `[，。；]${SHORT_EVAL}(?:虽然|虽)[^。；]{0,6}${TURN}`,
+  ].join('|'),
+);
+
 // 长句未切分：一段之内连续 56 个字符没有出现逗号、分号、顿号或者句中点号。
 export const LONG_CLAUSE = /[^，；、：,;]{56,}/;
