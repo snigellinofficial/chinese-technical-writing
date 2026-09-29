@@ -18,6 +18,9 @@ import {
   FUNCTION_WORDS,
   FUNCTION_OPTIONAL,
   PATTERN_TEMPLATES,
+  TRUNCATED,
+  NOUN_PHRASE_COLON,
+  MISSING_TIME_MARK,
   JARGON,
   BLOG_TITLE,
   PENDING_STYLE,
@@ -192,6 +195,29 @@ for (const absolute of files) {
       if (new RegExp(pattern.source).test(line)) {
         audit(file, lineNumber, '句式模板', `“${label}”属于成对套话，确认是否必要`, line);
       }
+    }
+
+    // 缩略化表达：命中即列为审计项，提示展开为完整结构。
+    for (const [truncated, expanded] of TRUNCATED) {
+      if (line.includes(truncated)) {
+        audit(file, lineNumber, '缩略化表达', `“${truncated}”应当展开为“${expanded}”`, line);
+      }
+    }
+
+    // 名词短语加冒号：属于解释型冒号的典型形态。
+    if (!heading && !isListItem(raw) && NOUN_PHRASE_COLON.test(raw) && !COLON_ALLOWED.test(line)) {
+      audit(
+        file,
+        lineNumber,
+        '名词短语冒号',
+        '名词短语不得用冒号引出解释，应当改为完整的动宾结构',
+        line,
+      );
+    }
+
+    // 动作句缺少时间标记：确认完成、进行或者计划状态是否写明。
+    if (MISSING_TIME_MARK(line) && !isListItem(raw) && !heading) {
+      audit(file, lineNumber, '缺少时间标记', '动作句应当标明完成、进行或者计划状态', line);
     }
 
     for (const word of JARGON) {
