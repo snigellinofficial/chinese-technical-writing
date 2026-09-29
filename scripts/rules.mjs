@@ -244,7 +244,26 @@ export const VERB_ASPECT = new RegExp(
   ].join(''),
 );
 
-// 生硬转折：转折词的两侧都是短评价语，或者某一侧不足四字。
+// 中英混用之一：英文术语在全文范围内未附中文释义。
+// 判定按文件进行，不使用紧邻条件，因为英文与汉字之间通常留空格。
+export const ENGLISH_TERM = /[A-Za-z][A-Za-z0-9.+#-]{2,24}/g;
+// 形如路径、域名或文件名的片段不属于术语，应当排除。
+export const TERM_NOISE = /[./]|-(?:square|case|flow|end|side|up|down)|^(?:https?|www)$/i;
+export const TERM_EXPLAINED = /[\u4e00-\u9fff]{2,20}（[A-Za-z][^）]{1,60}）|（[A-Za-z][^）]{1,60}，[A-Za-z][^）]{0,20}）/;
+export const TERM_EXCEPTIONS = new Set([
+  'RAG', 'API', 'SDK', 'CPU', 'GPU', 'HTTP', 'HTTPS', 'JSON', 'YAML', 'TOML', 'XML',
+  'CSV', 'PDF', 'PNG', 'JPEG', 'SVG', 'HTML', 'CSS', 'SQL', 'URI', 'URL', 'UUID',
+  'UTF', 'ASCII', 'LLM', 'GPT', 'MCP', 'CLI', 'GUI', 'ID', 'OS', 'IO', 'AI', 'ML',
+  'Node', 'Python', 'JavaScript', 'TypeScript', 'Markdown', 'Git', 'GitHub', 'Windows',
+  'Linux', 'macOS', 'Chrome', 'Edge', 'Vite', 'Docker',
+  'DSH', 'MIT', 'skill', 'Skill', 'shields', 'img', 'badge', 'style', 'scripts', 'script',
+  'npm', 'npx', 'pnpm', 'git', 'node', 'curl', 'bash', 'python', 'pip', 'docker',
+]);
+
+// 中英混用之二：应当置于代码框的英文命令，却写成普通文本。
+// 文件名不作为判定对象，因为路径与库名容易与文件名混淆；该项依靠自检。
+export const COMMAND_LIKE =
+  /(?<![`\w./])(?:npm|npx|pnpm|yarn|node|git|gh|python|pip|docker|kubectl|curl|PowerShell|bash|sh)\s+[a-z-]{2,}/;
 // 合规写法为把两侧展开为完整分句，或者拆成两句陈述理由。
 const TURN = '(?:但|却|可是|不过)';
 const SHORT_EVAL = '[\\u4e00-\\u9fff]{1,4}';

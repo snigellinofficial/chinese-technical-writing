@@ -22,6 +22,11 @@ import {
   NOUN_PHRASE_COLON,
   MISSING_TIME_MARK,
   ABRUPT_TURN,
+  ENGLISH_TERM,
+  TERM_EXPLAINED,
+  TERM_NOISE,
+  TERM_EXCEPTIONS,
+  COMMAND_LIKE,
   JARGON,
   BLOG_TITLE,
   PENDING_STYLE,
@@ -272,6 +277,20 @@ for (const absolute of files) {
       );
     }
 
+    // 中英混用之二：命令应当置于代码框内。
+    if (!raw.includes('`')) {
+      const command = raw.match(COMMAND_LIKE);
+      if (command) {
+        audit(
+          file,
+          lineNumber,
+          '命令未置于代码框',
+          `“${command[0]}”应当置于行内代码或者代码块之内`,
+          raw,
+        );
+      }
+    }
+
     for (const verb of EMPTY_VERB) {
       if (line.includes(verb)) {
         audit(file, lineNumber, '空洞动词', `“${verb}”应当替换为具体动作`, line);
@@ -315,6 +334,22 @@ for (const absolute of files) {
       report(file, index + 1, '行内代码两侧缺空格', `“${hits[0]}”两侧应当有一个半角空格`, raw);
     }
   });
+
+  // 中英混用之一：全文范围内的英文术语，至少应有一处附中文释义。
+  // 判定按文件进行：出现两次以上、且全文无括号释义、且不在例外表内的术语列入审计。
+  const plain = content.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`]*`/g, ' ');
+  const occurrences = new Map();
+  for (const term of plain.match(ENGLISH_TERM) ?? []) {
+    occurrences.set(term, (occurrences.get(term) ?? 0) + 1);
+  }
+  const explained = TERM_EXPLAINED.test(plain);
+  for (const [term, count] of occurrences) {
+    if (count < 2) continue;
+    if (TERM_EXCEPTIONS.has(term)) continue;
+    if (TERM_NOISE.test(term)) continue;
+    if (explained) continue;
+    audit(file, 0, '英文术语未附释义', `“${term}”出现 ${count} 次，全文未见中文释义`, term);
+  }
 }
 
 console.log(`检查文件：${files.length} 个`);
