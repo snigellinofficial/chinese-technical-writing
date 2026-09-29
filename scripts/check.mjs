@@ -55,6 +55,15 @@ const BARE_LIST = /[一二三四五六七八九十两]处[，、][^。；]{2,}[�
 // 行末的“如下”与“如下：”均符合规范；内容与引出语同行时才需要改为分段。
 const AS_FOLLOWS_INLINE = /如下[所示]*[，、。；]|如下[所示]*[^：。；，、\s]{2,}/;
 
+// 跨段列举是否带编号无法由程序可靠判定：列举之后常跟承接段落，二者结构相同。
+// 该项列入“参考”文档的实现要点，由输出之前的自检承担。
+
+// 空洞动词：应当替换为具体动作。
+const EMPTY_VERB = ['指向', '关乎', '意味着', '赋能于'];
+// “作为”引出解释的写法：该词只用于表示身份归类。
+// 表示归类时后面接名词短语，因此只检查“作为”引导的动词性解释与“作为……的”结构。
+const AS_EXPLAINING = /作为[^，。；：]{0,12}(?:的|地|方式|手段|方法|途径|工具)|作为[^，。；：]{0,20}(?:使用|处理|说明|判断|衡量|解决)/;
+
 // 解释型冒号：正文语句中不应当用冒号引出解释。
 const EXPLANATORY_COLON = /[\u4e00-\u9fff]：[^“”\s]/;
 // 以下情形属于列表引出、引用引出与枚举分档，不计入审计。
@@ -189,6 +198,16 @@ for (const absolute of files) {
 
     if (AS_FOLLOWS_INLINE.test(line)) {
       audit(file, lineNumber, '如下用法', '“如下”之后应当使用冒号并另起一段，段首用顺序词或编号', line);
+    }
+
+    for (const verb of EMPTY_VERB) {
+      if (line.includes(verb)) {
+        audit(file, lineNumber, '空洞动词', `“${verb}”应当替换为具体动作`, line);
+      }
+    }
+
+    if (AS_EXPLAINING.test(line)) {
+      audit(file, lineNumber, '“作为”用法', '“作为”只用于表示身份归类，引出解释时应当改用“因为”“由于”', line);
     }
 
     if (
