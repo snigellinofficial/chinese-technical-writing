@@ -33,13 +33,17 @@ emoji、套话、句长与段落粒度同样无法可靠地机械判定，一并
 
 统计口径说明：会话数指包含该词的会话个数，出现次数指全部会话中的累计次数。上一次统计覆盖 172 个会话，助手文本约 62 万字符，命中候选词 26 个，结果保存在 `word-audit.md`。
 
-扩充词表的步骤有三步：
+动词部分的候选词由 `scripts/verb-cluster.mjs` 生成。该程序从同一批语料中提取动词性片段，按后缀结构聚类，覆盖三类形态：单字动词加体标记或者补语（写完、装好、跑完）、虚化动词加双字名词（进行处理）、口语动词短语（看一下、跑一遍）。上一次统计命中 85 个片段，结果保存在 `verb-cluster.md`。
 
-首先，运行 `node scripts/word-audit.mjs word-audit.md` 取得新的分布。
+扩充词表的步骤有四步：
+
+首先，运行 `node scripts/word-audit.mjs word-audit.md` 与 `node scripts/verb-cluster.mjs verb-cluster.md` 取得新的分布。
 
 其次，把命中次数较高的新词补入 `scripts/rules.mjs` 的 `COLLOQUIAL` 表，并给出对应的书面表述。
 
-最后，在 `reference.md` 的替换表中补充同一组对照关系，并运行检查程序确认规则仍然通过。
+再次，在 `reference.md` 的替换表中补充同一组对照关系。
+
+最后，运行 `node self-test.mjs` 与检查程序，确认规则仍然通过。
 
 ## 三、改动流程
 

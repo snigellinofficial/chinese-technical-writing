@@ -26,6 +26,7 @@ import {
   COLON_BEFORE_LIST,
   LIST_INTRO_PERIOD,
   LONG_CLAUSE,
+  VERB_ASPECT,
 } from './rules.mjs';
 
 const CJK = /[\u4e00-\u9fff]/;
@@ -172,6 +173,18 @@ for (const absolute of files) {
 
     if (LIST_INTRO_PERIOD.test(raw)) {
       audit(file, lineNumber, '列举引出语用句号', '引出列举的短句应当以冒号收尾', raw);
+    }
+
+    // 单字动词加体标记或者补语：确认该结构是否有对应的书面词。
+    const aspect = line.match(VERB_ASPECT);
+    if (aspect) {
+      audit(
+        file,
+        lineNumber,
+        '动词体标记',
+        `“${aspect.slice(0, 3).join('”“')}”属于单字动词加补语，确认是否有书面词可替换`,
+        line,
+      );
     }
 
     for (const verb of EMPTY_VERB) {
