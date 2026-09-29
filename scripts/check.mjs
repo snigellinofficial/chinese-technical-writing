@@ -13,6 +13,7 @@ import { join, extname, relative, sep } from 'node:path';
 import {
   BANNED,
   COLLOQUIAL,
+  ELEGANT_IDIOMS,
   JARGON,
   BLOG_TITLE,
   PENDING_STYLE,
@@ -144,6 +145,14 @@ for (const absolute of files) {
     for (const [colloquial, formal] of COLLOQUIAL) {
       if (line.includes(colloquial)) {
         audit(file, lineNumber, '口语用词', `“${colloquial}”应当改为“${formal}”`, line);
+      }
+    }
+
+    // 典雅成语属于应保留的表达，命中时提示不要改写。
+    for (const idiom of ELEGANT_IDIOMS) {
+      if (line.includes(idiom)) {
+        audit(file, lineNumber, '典雅成语', `“${idiom}”属于规范书面表达，予以保留`, line);
+        break;
       }
     }
 
